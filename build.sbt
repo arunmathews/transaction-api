@@ -1,9 +1,9 @@
 import org.scalatra.sbt.ScalatraPlugin
 import BuildTasks._
-import com.transactionapi.sbt.SbtFlywayMigrateDb._
-import com.transactionapi.sbt.SbtSlickCodegen._
-import com.transactionapi.sbt.SbtDatabaseTasks._
-import com.transactionapi.sbt.SbtTestWithDb._
+import SbtFlywayMigrateDb._
+import SbtSlickCodegen._
+import SbtDatabaseTasks._
+import SbtTestWithDb._
 import sbt.Keys._
 import com.earldouglas.xwp.JettyPlugin.autoImport.Jetty
 
@@ -24,7 +24,7 @@ lazy val commonSettings = Seq(
   assembly / assemblyMergeStrategy := {
     case PathList("mime.types") =>
       MergeStrategy.last
-    case "logback.xml" =>
+    case "conf/logback.xml" =>
       MergeStrategy.discard
     case x =>
       val oldStrategy = (assembly / assemblyMergeStrategy).value
@@ -55,6 +55,11 @@ lazy val service = project.in(file("service")).settings(
       "org.scalatra" %% "scalatra" % ScalatraVersion,
       ("org.scalatra" %% "scalatra-commands" % ScalatraVersion).exclude("commons-collections", "commons-collections"),
       "org.scalatra" %% "scalatra-json" % ScalatraVersion,
+      "org.scalatra" %% "scalatra-forms" % ScalatraVersion,
+      "org.scalatra" %% "scalatra-metrics" % ScalatraVersion,
+      //Scalaz
+      "org.scalaz" %% "scalaz-core" % "7.2.6",
+      "io.verizon.delorean" %% "core" % "1.2.40-scalaz-7.2",
       //JSON
       "org.json4s" % "json4s-core_2.12" % Json4sVersion,
       "org.json4s" % "json4s-jackson_2.12" % Json4sVersion,
@@ -74,13 +79,14 @@ lazy val service = project.in(file("service")).settings(
       "com.beachape" %% "enumeratum" % EnumeratumVersion,
       "com.beachape" %% "enumeratum-json4s" % EnumeratumVersion,
       "com.google.guava" % "guava" % "27.1-jre",
+      "org.apache.httpcomponents" % "httpcore" % "4.4.11",
       //Test
       "org.scalatra" %% "scalatra-scalatest" % ScalatraVersion % "test",
       "org.scalatra" %% "scalatra-specs2" % ScalatraVersion % "test",
       "org.scalatest" %% "scalatest" % "3.0.7" % "test",
       //Runtime
       "ch.qos.logback" % "logback-classic" % LogbackVersion % "runtime",
-      "org.eclipse.jetty" % "jetty-webapp" % "9.2.10.v20150310" % "container",
+      "org.eclipse.jetty" % "jetty-webapp" % "9.4.9.v20180320" % "container",
       "javax.servlet" % "javax.servlet-api" % "3.1.0" % "provided"
     ),
     containerPort in Jetty := 9080,
@@ -92,7 +98,7 @@ lazy val service = project.in(file("service")).settings(
     // register manual slick codegen sbt command
     genScalaTables := slickCodeGenTask(dbHostUrl, dbDefaultUser, dbDefaultPassword, commonDb,
       slickCodeGeneratorFQCN, slickPostgresDriverFQCN, dbGenSourcePkg, dbGenSourceDir).value,
-// register automatic code generation on every compile, remove for only manual use
+    // register automatic code generation on every compile, remove for only manual use
     Compile / sourceGenerators += genScalaTables.toTask.taskValue
   )
 ).enablePlugins(ScalatraPlugin)
@@ -121,10 +127,10 @@ lazy val flyway = (project in file("flyway"))
         "joda-time" % "joda-time" % JodaVersion
       ),
       //register manual flyway db migrate command
-      migrateFlywayDbTables := (migrateFlywayDbTask(defaultPropertiesPath, dbFlywayLocation)).evaluated,
-      setupCommonDb := createCommonDbAndTablesTask.value,
-      Test / setupTestDb := createTestDbAndTablesTask.value,
-      Test / teardownTestDb := (dropDbInputTask(dbHostUrl, dbDefaultUser, dbDefaultPassword, defaultDb,
-        testDb)).evaluated
+      migrateFlywayDbTables := migrateFlywayDbTask(defaultPropertiesPath, dbFlywayLocation).evaluated,
+      setupCommonDb := createCommonDbAndTablesTask().value,
+      Test / setupTestDb := createTestDbAndTablesTask().value,
+      Test / teardownTestDb := dropDbInputTask(dbHostUrl, dbDefaultUser, dbDefaultPassword, defaultDb,
+        testDb).evaluated
     )
   ).enablePlugins(FlywayPlugin)

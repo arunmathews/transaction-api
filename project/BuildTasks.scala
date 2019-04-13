@@ -1,13 +1,12 @@
 import java.io.File
 
 import com.earldouglas.xwp.JettyPlugin._
-
-import com.transactionapi.sbt.SbtDatabaseTasks._
+import SbtDatabaseTasks._
 import com.earldouglas.xwp.JettyPlugin
 import com.earldouglas.xwp.JettyPlugin.autoImport._
 import com.earldouglas.xwp.ContainerPlugin.autoImport._
-import com.transactionapi.sbt.ExtractParamsUtils
 import com.typesafe.config.ConfigFactory
+import net.ceedubs.ficus.Ficus._
 import sbt.Keys._
 import sbt._
 
