@@ -13,14 +13,19 @@ import org.joda.time.DateTime
   */
 object TransactionValidationUtils {
 
-  def createTransaction(createCommand: ValidateCreateTransactionCommand):
+  def validateTransaction(createCommand: ValidateCreateTransactionCommand):
   ValidationNel[BOValidationFailure, TransactionBO] = {
     (checkMissingNonEmpty(TRANS_ID, createCommand.txId.value).toValidationNel |@|
       checkMissingNonEmpty(USER_ID, createCommand.userId.value).toValidationNel |@|
       checkMissingNonEmpty(MERCHANT_ID, createCommand.merchantId.value).toValidationNel |@|
       checkMissingNonEmpty(MERCHANT, createCommand.merchant.value).toValidationNel |@|
       validatePrice(createCommand.price.value).toValidationNel |@|
-      validatePurchaseDate(createCommand.purchaseDate.value).toValidationNel)(TransactionBO.apply)
+      validatePurchaseDate(createCommand.purchaseDate.value).toValidationNel |@|
+      false.successNel[BOValidationFailure])(TransactionBO.apply)
+  }
+
+  def validateTransactionId(maybeId: Option[String]): ValidationNel[BOValidationFailure, String] = {
+    checkMissingNonEmpty(TRANS_ID, maybeId).toValidationNel
   }
 
   private def checkMissingNonEmpty[T](fieldName: BOFieldName, maybeT: Option[T]): Validation[BOValidationFailure, T] = {

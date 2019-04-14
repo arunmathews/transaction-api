@@ -1,5 +1,6 @@
 package com.sofichallenge.transactionapi.json
 
+import com.sofichallenge.transactionapi.businessobject.TransactionBO.TransactionBOSerializer
 import com.sofichallenge.transactionapi.datetime.{DateTimeSerializer, LocalDateSerializer}
 import com.sofichallenge.transactionapi.service.validation.businessobject.{BOFieldNameSerializer, BOValidationFailureCode}
 import enumeratum.Json4s
@@ -12,6 +13,7 @@ object JsonFormats {
   val jsonFormat: Formats = DefaultFormats.withBigDecimal +
     LocalDateSerializer +
     DateTimeSerializer +
+    TransactionBOSerializer +
     BOFieldNameSerializer +
     Json4s.serializer(BOValidationFailureCode)
 }

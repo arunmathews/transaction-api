@@ -1,20 +1,15 @@
 CREATE TABLE "transaction" (
 "id"                     SERIAL PRIMARY KEY,
 "transaction_id"         VARCHAR NOT NULL,
-"user_id"                INTEGER NOT NULL,
-"merchant_id"            INTEGER NOT NULL,
+"user_id"                VARCHAR NOT NULL,
+"merchant_id"            VARCHAR NOT NULL,
+"merchant_name"          VARCHAR NOT NULL,
 "price"                  NUMERIC(17, 6) NOT NULL,
 "purchase_date"          TIMESTAMP NOT NULL,
-"active"                 BOOLEAN NOT NULL,
+"void"                   BOOLEAN NOT NULL,
 "created"                TIMESTAMP NOT NULL,
 "modified"               TIMESTAMP
 );
-
-ALTER TABLE "transaction" ADD CONSTRAINT "user_fk" FOREIGN KEY("user_id") REFERENCES "user"("id") ON UPDATE NO ACTION
-ON DELETE NO ACTION;
-
-ALTER TABLE "transaction" ADD CONSTRAINT "merchant_fk" FOREIGN KEY("merchant_id") REFERENCES "merchant"("id")
-ON UPDATE NO ACTION ON DELETE NO ACTION;
 
 CREATE UNIQUE INDEX "transaction_idx1" ON "transaction"("transaction_id");
 
