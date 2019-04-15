@@ -2,7 +2,7 @@ import io.github.davidmweber.FlywayPlugin
 import sbt._
 
 /**
-  *
+  * Run flyway migration from sbt
   */
 object SbtFlywayMigrateDb {
 

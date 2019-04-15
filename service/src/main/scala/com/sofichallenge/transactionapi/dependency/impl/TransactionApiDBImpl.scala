@@ -10,9 +10,9 @@ import com.sofichallenge.transactionapi.handler.TransactionMagicConstants
 import scala.concurrent.{ExecutionContext, Future}
 
 /**
-  *
+  * Transaction api impl that writes to database
   */
-class TransactionApiDBImpl(val tablesWithDb: TablesWithDb)(implicit val ec: ExecutionContext) extends TransactionApi {
+class TransactionApiDBImpl(val tablesWithDb: TablesWithDb)(implicit val ec: ExecutionContext) extends TransactionApi with nl.grons.metrics.scala.DefaultInstrumented {
   import tablesWithDb.profile.api._
 
   private val db = tablesWithDb.db
@@ -27,7 +27,9 @@ class TransactionApiDBImpl(val tablesWithDb: TablesWithDb)(implicit val ec: Exec
 
     val namedAction = dbAction.named(s"${getClass.getSimpleName} - storeTx")
 
-    db.run(namedAction)
+    val storing = metrics.timer(s"${getClass.getSimpleName} - storeTx")
+
+    storing.timeFuture(db.run(namedAction))
   }
 
   override def updateTransaction(txId: Int, void: Boolean): Future[Option[TransactionBO]] = {
@@ -39,7 +41,9 @@ class TransactionApiDBImpl(val tablesWithDb: TablesWithDb)(implicit val ec: Exec
 
     val namedAction = dbAction.named(s"${getClass.getSimpleName} - voidTx")
 
-    db.run(namedAction)
+    val voiding = metrics.timer(s"${getClass.getSimpleName} - voidTx")
+
+    voiding.timeFuture(db.run(namedAction))
   }
 
   override def getTransaction(txId: Int): Future[Option[TransactionBO]] = {

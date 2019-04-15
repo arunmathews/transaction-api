@@ -7,9 +7,8 @@ import org.json4s.JsonAST.{JNull, JString}
 import org.scalatra.commands.JodaDateFormats
 
 /**
-  *
+  * Custom json date format for joda time
   */
-
 object JsonDateFormats {
   val dateTimeFormatter = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss").withZoneUTC()
 

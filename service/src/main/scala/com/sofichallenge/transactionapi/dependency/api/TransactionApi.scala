@@ -1,11 +1,11 @@
 package com.sofichallenge.transactionapi.dependency.api
 
-import com.sofichallenge.transactionapi.businessobject.{GetMerchantsSpecifiers, GetTransactionsSpecifiers, SearchTxsResultsBO, TransactionBO}
+import com.sofichallenge.transactionapi.businessobject._
 
 import scala.concurrent.Future
 
 /**
-  *
+  * Contract for internal transaction api
   */
 trait TransactionApi {
   def createTransaction(trans: TransactionBO): Future[TransactionBO]

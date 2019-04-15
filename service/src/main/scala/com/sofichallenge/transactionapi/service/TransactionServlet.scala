@@ -7,14 +7,21 @@ import scalaz._
 import Scalaz._
 import com.sofichallenge.transactionapi.handler.TransactionRequestHandler
 import com.sofichallenge.transactionapi.service.businessobject.StoreTransOperationOutputBO
+import org.scalatra.metrics.MetricsSupport
 
 import scala.concurrent.{ExecutionContext, Future}
 
+/**
+  * Servlet that responds to transaction http requests
+  *
+  * @param reqHandler
+  */
 class TransactionServlet(reqHandler: TransactionRequestHandler)
   extends TransactionApiStack
     with JsonSupportMixin
     with ErrorSupportMixin
-    with FutureSupport {
+    with FutureSupport
+    with MetricsSupport {
 
   post("/v1/transactions") {
     new AsyncResult() {

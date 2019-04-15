@@ -7,13 +7,14 @@ import org.json4s.CustomSerializer
 import org.json4s.JsonAST.{JNull, JObject, JString}
 import org.json4s.JsonDSL._
 
-/**
-  *
-  */
 case class TransactionBO(txId: Int, userId: Int, merchantId: Int, merchant: String,
                          price: BigDecimal, purchaseDate: DateTime, void: Boolean)
 
 object TransactionBO {
+
+  /**
+    * Custom serializer for serializing transactions in the response
+    */
   object TransactionBOSerializer extends CustomSerializer[TransactionBO] (format =>
     (
       {

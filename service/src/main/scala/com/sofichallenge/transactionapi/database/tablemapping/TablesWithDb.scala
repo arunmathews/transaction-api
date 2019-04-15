@@ -1,9 +1,7 @@
 package com.sofichallenge.transactionapi.database.tablemapping
 
 import slick.jdbc.JdbcProfile
-/**
-  *
-  */
+
 trait TablesWithDb extends Tables {
   val profile: JdbcProfile
 

@@ -8,7 +8,7 @@ import scala.concurrent.Await
 import scala.concurrent.duration._
 
 /**
-  *
+  * Definition of database related tasks to be run from sbt - create db, drop db etc.
   */
 object SbtDatabaseTasks extends AutoPlugin {
   val jdbcDriver = "org.postgresql.Driver"

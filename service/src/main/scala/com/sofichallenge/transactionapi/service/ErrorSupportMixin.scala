@@ -5,7 +5,7 @@ import org.scalatra._
 import org.slf4j.LoggerFactory
 
 /**
- *
+ * Misin errors specific logic to the servlet
  */
 trait ErrorSupportMixin {
   self: ScalatraBase =>

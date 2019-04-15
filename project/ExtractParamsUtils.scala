@@ -4,7 +4,7 @@ import com.typesafe.config.{Config, ConfigFactory}
 import net.ceedubs.ficus.Ficus._
 
 /**
-  *
+  * Utility class for extracting params from conf files
   */
 object ExtractParamsUtils {
 

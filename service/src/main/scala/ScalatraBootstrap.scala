@@ -1,5 +1,7 @@
 import java.io.File
+import java.util.concurrent.TimeUnit
 
+import com.codahale.metrics.ConsoleReporter
 import com.mchange.v2.c3p0.ComboPooledDataSource
 import com.sofichallenge.transactionapi.service.{PingServlet, TransactionServlet}
 import com.typesafe.config.ConfigFactory
@@ -11,10 +13,16 @@ import com.sofichallenge.transactionapi.bootstrap.BootstrapConfigHelper._
 import com.sofichallenge.transactionapi.database.tablemapping.PostgresTablesWithDb
 import com.sofichallenge.transactionapi.dependency.impl.TransactionApiDBImpl
 import com.sofichallenge.transactionapi.handler.TransactionRequestHandler
+import org.scalatra.metrics.MetricsBootstrap
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class ScalatraBootstrap extends LifeCycle with BootstrapConfigHelper {
+class ScalatraBootstrap extends LifeCycle with BootstrapConfigHelper with MetricsBootstrap {
+  ConsoleReporter.forRegistry(metricRegistry)
+    .convertRatesTo(TimeUnit.SECONDS)
+    .convertDurationsTo(TimeUnit.MILLISECONDS)
+    .build().start(10, TimeUnit.SECONDS)
+  
   val logger = LoggerFactory.getLogger(getClass)
   val baseConf = ConfigFactory.load()
   val fileLocation = "override/local.properties"

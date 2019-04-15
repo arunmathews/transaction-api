@@ -3,7 +3,7 @@ package com.sofichallenge.transactionapi.database.tablemapping
 import com.mchange.v2.c3p0.ComboPooledDataSource
 
 /**
-  *
+  * Postgres specific slick profile
   */
 class PostgresTablesWithDb(cpds: ComboPooledDataSource) extends TablesWithDb {
   override val profile = slick.jdbc.PostgresProfile

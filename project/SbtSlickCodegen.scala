@@ -6,7 +6,7 @@ import sbt.{Def, _}
 import scala.util.{Failure, Success}
 
 /**
-  *
+  * Generate scala code for writing to tables using Slick from sbt
   */
 object SbtSlickCodegen extends AutoPlugin {
 

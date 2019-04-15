@@ -1,3 +1,10 @@
+#
+# Reads csv file and calls service to post transactions
+#
+# Usage: ruby post_transactions.rb data_csv_path service_prefix
+#
+#
+
 require 'net/https'
 require 'uri'
 require 'json'

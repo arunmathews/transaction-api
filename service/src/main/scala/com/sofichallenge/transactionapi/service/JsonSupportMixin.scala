@@ -8,7 +8,7 @@ import org.scalatra.commands.JacksonJsonParsing
 import org.scalatra.json.JacksonJsonSupport
 
 /**
- *
+ * Mixin json specific logic to the servlet
  */
 trait JsonSupportMixin
   extends JacksonJsonParsing
@@ -19,10 +19,4 @@ trait JsonSupportMixin
   }
 
   protected implicit lazy val jsonFormats: Formats = JsonFormats.jsonFormat
-
-  //protected override def transformRequestBody(body: JValue): JValue = body.camelizeKeys
-
-  //protected override def transformResponseBody(body: JValue): JValue = body.underscoreKeys
-
-
 }

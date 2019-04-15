@@ -1,8 +1,5 @@
 package com.sofichallenge.transactionapi.handler
 
-/**
-  *
-  */
 object TransactionMagicConstants {
   val sortMerchantId = "merchant-id"
   val sortTxId = "tx-id"

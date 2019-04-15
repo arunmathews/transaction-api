@@ -4,7 +4,7 @@ import sbt._
 import SbtFlywayMigrateDb._
 
 /**
-  *
+  * Utility methods to run tests from sbt console
   */
 object SbtTestWithDb extends AutoPlugin {
   def testWithDbTask(dbHostUrl: String, user: String, password: Option[String], defaultDb: String, testDb: String,

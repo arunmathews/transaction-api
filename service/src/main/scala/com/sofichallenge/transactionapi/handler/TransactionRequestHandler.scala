@@ -11,7 +11,7 @@ import com.sofichallenge.transactionapi.service.validation.businessobject.Transa
 import scala.concurrent.{ExecutionContext, Future}
 
 /**
-  *
+  * Busines logic layer that handles requests from caller. This uses provides api(s) to store and retrieve txs
   */
 class TransactionRequestHandler(transactionApi: TransactionApi)(implicit val ec: ExecutionContext) {
   def createTransaction(txBO: TransactionBO): Future[ValidationNel[BOValidationFailure, TransactionBO]] = {
