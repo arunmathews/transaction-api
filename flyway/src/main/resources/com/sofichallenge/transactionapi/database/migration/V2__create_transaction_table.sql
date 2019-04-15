@@ -1,8 +1,8 @@
 CREATE TABLE "transaction" (
 "id"                     SERIAL PRIMARY KEY,
-"transaction_id"         VARCHAR NOT NULL,
-"user_id"                VARCHAR NOT NULL,
-"merchant_id"            VARCHAR NOT NULL,
+"transaction_id"         INTEGER NOT NULL,
+"user_id"                INTEGER NOT NULL,
+"merchant_id"            INTEGER NOT NULL,
 "merchant_name"          VARCHAR NOT NULL,
 "price"                  NUMERIC(17, 6) NOT NULL,
 "purchase_date"          TIMESTAMP NOT NULL,

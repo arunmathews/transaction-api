@@ -17,7 +17,8 @@ object SbtSlickCodegen extends AutoPlugin {
                        sourceCodeGenClassPath: String, slickDriverPath: String, dbGenSourcePkg: String,
                        dbGenSourceDir: String):
   Def.Initialize[Task[Seq[File]]] = Def.task {
-    val dir = sourceManaged.value
+    
+    val dir = (Compile / scalaSource).value
     val r = (Compile / runner).value
     val cp = (Compile / dependencyClasspath).value
     val s = streams.value
@@ -30,7 +31,7 @@ object SbtSlickCodegen extends AutoPlugin {
                                  dbGenSourceDir: String, dir: File, r: ScalaRun, cp: Keys.Classpath,
                                  s: Keys.TaskStreams): Seq[File] = {
     val url = s"$dbHostUrl/$dbName"
-    val outputDir = (dir / "main" / "scala").getPath
+    val outputDir = dir.getPath
     val jdbcDriver = "org.postgresql.Driver"
     val pkg = dbGenSourcePkg
 

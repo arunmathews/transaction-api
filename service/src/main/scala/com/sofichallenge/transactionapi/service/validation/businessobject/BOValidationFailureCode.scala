@@ -15,5 +15,7 @@ object BOValidationFailureCode extends Enum[BOValidationFailureCode]{
 
   case object Missing extends BOValidationFailureCode
 
+  case object Duplicate extends BOValidationFailureCode
+
   case object Unknown extends BOValidationFailureCode
 }

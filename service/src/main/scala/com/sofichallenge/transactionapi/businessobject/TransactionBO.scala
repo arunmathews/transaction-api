@@ -10,7 +10,7 @@ import org.json4s.JsonDSL._
 /**
   *
   */
-case class TransactionBO(txId: String, userId: String, merchantId: String, merchant: String,
+case class TransactionBO(txId: Int, userId: Int, merchantId: Int, merchant: String,
                          price: BigDecimal, purchaseDate: DateTime, void: Boolean)
 
 object TransactionBO {

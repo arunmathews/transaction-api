@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory
 import com.sofichallenge.transactionapi.bootstrap.BootstrapConfigHelper
 import com.sofichallenge.transactionapi.bootstrap.BootstrapConfigHelper._
 import com.sofichallenge.transactionapi.database.tablemapping.PostgresTablesWithDb
-import com.sofichallenge.transactionapi.dependency.impl.TramsactionApiDBImpl
+import com.sofichallenge.transactionapi.dependency.impl.TransactionApiDBImpl
 import com.sofichallenge.transactionapi.handler.TransactionRequestHandler
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -32,7 +32,7 @@ class ScalatraBootstrap extends LifeCycle with BootstrapConfigHelper {
   logger.info("Created c3p0 connection pool and db")
 
   override def init(context: ServletContext) {
-    val txApi = new TramsactionApiDBImpl(tablesWithDb)
+    val txApi = new TransactionApiDBImpl(tablesWithDb)
     val txHandler = new TransactionRequestHandler(txApi)
 
     context.mount(new TransactionServlet(txHandler), "/*")

@@ -97,9 +97,9 @@ lazy val service = project.in(file("service")).settings(
     ),
     // register manual slick codegen sbt command
     genScalaTables := slickCodeGenTask(dbHostUrl, dbDefaultUser, dbDefaultPassword, commonDb,
-      slickCodeGeneratorFQCN, slickPostgresDriverFQCN, dbGenSourcePkg, dbGenSourceDir).value,
+      slickCodeGeneratorFQCN, slickPostgresDriverFQCN, dbGenSourcePkg, dbGenSourceDir).value//,
     // register automatic code generation on every compile, remove for only manual use
-    Compile / sourceGenerators += genScalaTables.toTask.taskValue
+    //Compile / sourceGenerators += genScalaTables.toTask.taskValue
   )
 ).enablePlugins(ScalatraPlugin)
 

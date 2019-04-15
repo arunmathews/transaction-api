@@ -11,10 +11,10 @@ import org.scalatra.commands._
 class ValidateCreateTransactionCommand extends ValidateBaseCommand {
   override protected implicit def jsonFormats: Formats = JsonFormats.jsonFormat
 
-  val userId: Field[String] = asString("user-id").required.notBlank
-  val merchantId: Field[String] = asString("merchant-id").required.notBlank
+  val userId: Field[Int] = asInt("user-id").required
+  val merchantId: Field[Int] = asInt("merchant-id").required
   val merchant: Field[String] = asString("merchant").required.notBlank
   val price: Field[String] = asString("price").required.notBlank
   val purchaseDate: Field[String] = asString("purchase-date").required.notBlank
-  val txId: Field[String] = asString("tx-id").required.notBlank
+  val txId: Field[Int] = asInt("tx-id").required
 }

@@ -3,7 +3,7 @@ package com.sofichallenge.transactionapi.service.validation
 import com.sofichallenge.transactionapi.service.validation.businessobject.{BOFieldName, BOValidationFailure}
 import scalaz._
 import Scalaz._
-import com.sofichallenge.transactionapi.businessobject.TransactionBO
+import com.sofichallenge.transactionapi.businessobject._
 import com.sofichallenge.transactionapi.datetime.JsonDateFormats
 import com.sofichallenge.transactionapi.service.validation.businessobject.BOValidationFailureCode._
 import com.sofichallenge.transactionapi.service.validation.businessobject.TransactionOperationFieldName._
@@ -24,8 +24,76 @@ object TransactionValidationUtils {
       false.successNel[BOValidationFailure])(TransactionBO.apply)
   }
 
-  def validateTransactionId(maybeId: Option[String]): ValidationNel[BOValidationFailure, String] = {
-    checkMissingNonEmpty(TRANS_ID, maybeId).toValidationNel
+  def validateTransId(maybeId: Option[String]): ValidationNel[BOValidationFailure, Int] = {
+    validateId(TRANS_ID, maybeId)
+  }
+
+  def validationGetMerchantsSpecifiers(maybeUserIds: Option[Seq[String]],
+                                       maybeLimit: Option[String],
+                                       maybeSortDirection: Option[String]):
+  ValidationNel[BOValidationFailure, GetMerchantsSpecifiers] = {
+    val isAsc = !maybeSortDirection.contains("top")
+    val defaultLimit = 3
+
+    (validateSeq(USER_IDS, maybeUserIds, validateIntVal) |@|
+      ifPresentValidate(LIMIT, maybeLimit, validateIntVal).toValidationNel.map(
+        (maybeL: Option[Int]) => maybeL.getOrElse(defaultLimit)) |@|
+      isAsc.successNel[BOValidationFailure])(GetMerchantsSpecifiers.apply)
+  }
+
+  def validateGetTxsSpecifiers(maybeUserId: Option[String],
+                                maybeLimit: Option[String],
+                                maybeOffsetDate: Option[String],
+                                maybeOffsetInt: Option[String],
+                                maybeOffsetBigDec: Option[String],
+                                maybeSortKey: Option[String],
+                                maybePaginationDirection: Option[String]):
+  ValidationNel[BOValidationFailure, GetTransactionsSpecifiers] = {
+    val isForwardPagination = !maybePaginationDirection.contains("previous")
+    val defaultLimit = 5
+    (validateId(USER_ID, maybeUserId) |@|
+      ifPresentValidate(LIMIT, maybeLimit, validateIntVal).toValidationNel.map(
+        (maybeL: Option[Int]) => maybeL.getOrElse(defaultLimit)) |@|
+      ifPresentValidate(OFFSET_DATE, maybeOffsetDate, validateDateTime).toValidationNel |@|
+      ifPresentValidate(OFFSET_INT, maybeOffsetInt, validateIntVal).toValidationNel |@|
+      ifPresentValidate(OFFSET_BIGDEC, maybeOffsetBigDec, validateCurrencyBigDecimal).toValidationNel |@|
+      maybeSortKey.successNel[BOValidationFailure] |@|
+      isForwardPagination.successNel[BOValidationFailure])(GetTransactionsSpecifiers.apply)
+  }
+
+  private def validateSeq[T](seqFieldName: BOFieldName,
+                             maybeSeq: Option[Seq[String]],
+                             validateT: (BOFieldName, String) => Validation[BOValidationFailure, T]):
+  ValidationNel[BOValidationFailure, Seq[T]] = {
+    maybeSeq.fold(BOValidationFailure(seqFieldName, Missing, s"Missing $seqFieldName").failureNel[Seq[T]])(strings => {
+      val tVals = strings.map(s => validateT(seqFieldName, s).map(List(_)).toValidationNel)
+      tVals.reduce(_ +++ _) match {
+        case Failure(e) =>
+          BOValidationFailure(seqFieldName, Invalid, s"$seqFieldName Invalid").failureNel
+        case Success(xs) => xs.success[BOValidationFailure].toValidationNel
+      }
+    })
+  }
+
+  private def ifPresentValidate[T](fieldName: BOFieldName,
+                                   maybeString: Option[String],
+                                   f: (BOFieldName, String) => Validation[BOValidationFailure, T]):
+  Validation[BOValidationFailure, Option[T]] = {
+    maybeString.fold(Option.empty[T].success[BOValidationFailure])(string => f(fieldName, string).rightMap(Option.apply))
+  }
+
+  private def validateId(fieldName: BOFieldName, maybeId: Option[String]): ValidationNel[BOValidationFailure, Int] = {
+    checkMissingNonEmpty(fieldName, maybeId).disjunction.flatMap(s => validateInt(fieldName, s)).validationNel
+  }
+
+  private def validateIntVal(fieldName: BOFieldName, intString: String): Validation[BOValidationFailure, Int] = {
+    validateInt(fieldName: BOFieldName, intString: String).validation
+  }
+
+  private def validateInt(fieldName: BOFieldName, intString: String): BOValidationFailure \/ Int = {
+    \/.fromTryCatchThrowable[Int, Throwable](intString.toInt).
+      leftMap(_ => BOValidationFailure(TRANS_ID, Invalid,
+        s"Invalid field $TRANS_ID: $intString"))
   }
 
   private def checkMissingNonEmpty[T](fieldName: BOFieldName, maybeT: Option[T]): Validation[BOValidationFailure, T] = {

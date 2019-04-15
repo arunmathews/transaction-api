@@ -1,0 +1,29 @@
+version: "3.7"
+services:
+  sofi-chall-transactionapi:
+    build:
+      context: .
+      dockerfile: dockerfiles/Dockerfile
+    depends_on:
+      - sofi-chall-postgres
+    env_file:
+    - override/docker_dev.env
+    ports:
+      - "8888:8080"
+    networks:
+      sofi-chall-docker-network:
+        aliases:
+        - sofi-chall-transactionapi
+  sofi-chall-postgres:
+    image: postgres:10
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    networks:
+      sofi-chall-docker-network:
+        aliases:
+          - sofi-chall-postgres
+networks:
+  sofi-chall-docker-network:

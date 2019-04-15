@@ -1,8 +1,8 @@
 package com.sofichallenge.transactionapi.json
 
 import com.sofichallenge.transactionapi.businessobject.TransactionBO.TransactionBOSerializer
-import com.sofichallenge.transactionapi.datetime.{DateTimeSerializer, LocalDateSerializer}
-import com.sofichallenge.transactionapi.service.validation.businessobject.{BOFieldNameSerializer, BOValidationFailureCode}
+import com.sofichallenge.transactionapi.datetime.DateTimeSerializer
+import com.sofichallenge.transactionapi.service.validation.businessobject._
 import enumeratum.Json4s
 import org.json4s.{DefaultFormats, Formats}
 
@@ -11,7 +11,6 @@ import org.json4s.{DefaultFormats, Formats}
   */
 object JsonFormats {
   val jsonFormat: Formats = DefaultFormats.withBigDecimal +
-    LocalDateSerializer +
     DateTimeSerializer +
     TransactionBOSerializer +
     BOFieldNameSerializer +

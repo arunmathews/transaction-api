@@ -2,7 +2,6 @@ package com.sofichallenge.transactionapi.service
 
 import com.sofichallenge.transactionapi.service.validation.businessobject.BOValidationFailure
 import com.sofichallenge.transactionapi.service.validation._
-import org.scalatra._
 import org.scalatra.{AsyncResult, FutureSupport}
 import scalaz._
 import Scalaz._
@@ -23,7 +22,10 @@ class TransactionServlet(reqHandler: TransactionRequestHandler)
       override val is = {
         TransactionValidationUtils.validateTransaction(transCommand).fold(
           haltOnFailure,
-          succ => reqHandler.createTransaction(succ)
+          succ => reqHandler.createTransaction(succ).map(_.fold(
+            haltOnFailure,
+            succ => succ
+          ))
         )
       }
     }
@@ -33,12 +35,50 @@ class TransactionServlet(reqHandler: TransactionRequestHandler)
     new AsyncResult() {
       override val is = {
         val maybeTxId = params.get("id")
-        TransactionValidationUtils.validateTransactionId(maybeTxId).fold(
+        TransactionValidationUtils.validateTransId(maybeTxId).fold(
           haltOnFailure,
           succ => reqHandler.voidTransaction(succ).map(_.fold(
             haltOnFailure,
             succ => succ
           ))
+        )
+      }
+    }
+  }
+
+  get("/v1/transactions/merchants") {
+    new AsyncResult() {
+      override val is = {
+        val userIds = multiParams.get("user-id")
+        val limit = params.get("limit")
+        val sortType = params.get("sort-type")
+        TransactionValidationUtils.validationGetMerchantsSpecifiers(userIds, limit, sortType).fold(
+          haltOnFailure,
+          succ => reqHandler.getMerchants(succ).map(_.fold(
+            haltOnFailure,
+            succ => succ
+          ))
+        )
+      }
+    }
+  }
+
+  get("/v1/transactions") {
+    new AsyncResult() {
+      override val is = {
+        val userId = params.get("user-id")
+        val limit = params.get("limit")
+        val offsetDate = params.get("offset-date")
+        val offsetInt = params.get("offset-int")
+        val offsetBigDec = params.get("offset-price")
+
+        val sortKey = params.get("sort-key")
+        val paginationDirection = params.get("pagination-direction")
+
+        TransactionValidationUtils.validateGetTxsSpecifiers(userId, limit, offsetDate, offsetInt, offsetBigDec,
+          sortKey, paginationDirection).fold(
+          haltOnFailure,
+          succ => reqHandler.getTransactions(succ)
         )
       }
     }
