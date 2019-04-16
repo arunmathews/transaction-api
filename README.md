@@ -183,3 +183,20 @@ $ sbt
 > test:teardownTestDb           # Delete test db
 ```
 
+# Metrics #
+1. [metrics-scala](https://github.com/erikvanoosten/metrics-scala) is used for metrics. Basic support is added but needs more work
+
+# Discussion #
+1. When testing with the provided data User 2 does return an output because there are 5 transactions for User 2. 
+```
+count | user_id | merchant_id |  merchant_name
+ 4    |       2 |           1 | Bartell Drugs
+ 1    |       2 |           2 | Safeway
+```
+
+1. Transaction is the only domain object in this system for now. In a full fledged system user and merchant should be 
+first class concepts
+1. Currently there is no authorization or authentication on any of the calls. In a production system we would add them
+1. We are not recording history currently. We should add that to make the system more robust. We can leverage db 
+triggers for that. 
+1. Similarly we should have audit support to record who made the request and what the request was
