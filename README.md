@@ -27,30 +27,34 @@ needed. These dependencies could be databases, other services etc.
 # Running Service #
 ## Postgres + Service
 1. Create override/docker_dev.env file with values:
-```$xslt
+```
 db_jdbcUrl=jdbc:postgresql://sofi-chall-postgres:5432/postgres
 db_user=postgres
 db_password=postgres
 scalatra_environment=local
 db_flyway_table=schema_version
 ```
-1. Run docker-compose-up
+1. Run docker-compose-up script from root folder
 ```sh
 $ docker-compose-up.sh
 ```
 ## Service connecting to local postgres
 1. Create database first
 1. Create override/docker_desktop.env with values
-```$xslt
+```
 db_jdbcUrl=jdbc:postgresql://docker.for.mac.localhost:${PORT}/${DATABAE}
 db_user=${USER}
 db_password=${PASSWORD}
 scalatra_environment=local
 db_flyway_table=schema_version
 ```
-1. Run docker
+1. Start docker as
 ```sh
 bin/docker-local-start.sh
+```
+1. Stop docker as
+```bash
+bin/docker-local-stop.sh
 ```
 1. Ping service
 ```bash
@@ -61,24 +65,70 @@ curl -I http://localhost:8888/v1/ping
 ruby service/src/main/scripts/call_service.rb ${PATH_TO_DATA_CSV} http://localhost:8888
 ```
 # Exposed routes #
-* Create transaction - POST prefix/v1/transactions
-* Void transaction - PUT prefix/v1/transactions/:id/void
-* Get merchants - GET prefix/v1/transactions/merchants?user-id=${USER_ID_1}&user-id=${USER_ID_2}&limit=${LIMIT}&sort-type=asc or desc
+* Create transaction - POST http://localhost:8888/v1/transactions
+    * Will take request in the following format
+        ```json
+        {
+            "merchant": "Bartell Drugs",
+            "merchant-id": 1,
+            "price": 5.78,
+            "purchase-date": "2019-01-02T06:17:38",
+            "tx-id": 1,
+            "user-id": 1
+        }
+        ```
+    * Response will be 
+        ```json
+        {
+            "merchant": "Bartell Drugs",
+            "merchant-id": 1,
+            "price": 5.78,
+            "purchase-date": "2019-01-02T06:17:38",
+            "tx-id": 1,
+            "user-id": 1,
+            "void": false
+        }
+        ```
+    * Will return a 4xx response if we try to insert another transaction with the same id     
+* Void transaction - PUT http://localhost:8888/v1/transactions/:id/void
+    * Will return the voided transaction
+        ```json
+        {
+            "merchant": "Bartell Drugs",
+            "merchant-id": 1,
+            "price": 5.78,
+            "purchase-date": "2019-01-02T06:17:38",
+            "tx-id": 1,
+            "user-id": 1,
+            "void": true
+        }
+        ```
+* Get merchants - GET http://localhost:8888/v1/transactions/merchants?user-id=${USER_ID_1}&user-id=${USER_ID_2}&limit=${LIMIT}&sort-type=asc or desc
     * Params
         * user-id: can be multiple - user-id=${USER_ID_1}&user-id=${USER_ID_2}
         * limit: number
         * sort-type: "asc" or "desc"
-* Get transactions - GET prefix/v1/transactions?query-params
+    * Will return an array of merchants as response
+        ```json
+        {
+            "merchants": [
+                "Arbys",
+                "Lola",
+                "Flying Pie Pizza"
+            ]
+        }
+        ```
+* Get transactions - GET http://localhost:8888/v1/transactions?query-params
     * Params
-        * user-id: one user-id
+        * user-id: can only be 1 user-id
         * limit: number
         * offset-date: offset that is of type date
         * offset-int: offset that is int type
-        * offset-price: offset that is big decimal
+        * offset-price: offset that is of type big decimal
         * sort-key: key using which results will be sorted - merchant-id or tx-id or purchase-date or price
         * pagination-direction: "previous" or "next"
     * Example requests
-        * prefix/v1/transactions?user-id=1&sort-key=purchase-date&pagination-direction=previous
+        * http://localhost:8888/v1/transactions?user-id=1&sort-key=purchase-date&pagination-direction=previous
             * Sample response
                 ```json
                 {
@@ -93,12 +143,13 @@ ruby service/src/main/scripts/call_service.rb ${PATH_TO_DATA_CSV} http://localho
                             "tx-id": 49,
                             "user-id": 1,
                             "void": false
-                        },...
+                        },
+                        ...
                    ]
                 }
                 ```
-        * prefix/v1/transactions?user-id=1&sort-key=purchase-date&pagination-direction=next&offset-date=xx
-        * prefix/v1/transactions?user-id=1&sort-key=tx-id&pagination-direction=next
+        * http://localhost:8888/v1/transactions?user-id=1&sort-key=purchase-date&pagination-direction=next&offset-date=xx
+        * http://localhost:8888/v1/transactions?user-id=1&sort-key=tx-id&pagination-direction=next
             * Sample response
             ```json
             {
@@ -113,18 +164,32 @@ ruby service/src/main/scripts/call_service.rb ${PATH_TO_DATA_CSV} http://localho
                         "tx-id": 49,
                         "user-id": 1,
                         "void": false
-                    },...
+                    },
+                    ...
                ]
             }
             ```
-        * prefix/v1/transactions?user-id=1&sort-key=tx-id&pagination-direction=next&offset-int=xx
+        * http://localhost:8888/v1/transactions?user-id=1&sort-key=tx-id&pagination-direction=next&offset-int=xx
+* API calls will return a well defined json body in case of validation errors
+    * Validation error response
+        ```json
+        {
+            "validationFailures": [
+                {
+                    "displayString": "No transactions for provided user ids - List(4)",
+                    "failureCode": "invalid",
+                    "fieldName": "user-ids"
+                }
+            ]
+        }
+        ```        
 # Development #
 1. You need a running postgres for development
-1. Create local.properties file with values
+1. Create override/local.properties file with values
 ```
 scalatra_environment=local
-db_jdbcUrl=jdbc:postgresql://${DB_PATH}
-db_host_url=jdbc:postgresql://localhost
+db_jdbcUrl=jdbc:postgresql://localhost:${DB_PORT}/${DB_NAME}
+db_host_url=jdbc:postgresql://localhost:{DB_PORT}
 db_default_user=postgres
 default_db=postgres
 common_db=transaction_api
@@ -166,7 +231,7 @@ $ sbt
 1. Unit tests have an external dependency on postgres.
 1. Create test.properties file with values
 ```
-db_host_url=jdbc:postgresql://localhost
+db_host_url=jdbc:postgresql://localhost:${DB_PORT}
 default_db=postgres
 test_db=${TEST_DB_NAME}
 db_default_user=${USER}
