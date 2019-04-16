@@ -197,7 +197,7 @@ db_user=${USER}
 db_password=${PASSWORD}
 db_flyway_table=schema_version
 ```
-## FLyway ##
+## Flyway ##
 [Flyway](http://flywaydb.org/) is a tool that helps with db migrations.
 
 If you want to make schema changes:
